@@ -1,0 +1,7 @@
+{
+  "name": "cc-qa",
+  "version": "0.1.0",
+  "description": "/qa: adversarial QA on a diff. Fresh-context agents (mutation, property-based, API fuzzing, AI red team, adversarial review) try to break the change; a judge reproduces each finding and leaves one failing test per confirmed bug. Never fixes code, never commits.",
+  "author": { "name": "Eudes Serpa" },
+  "keywords": ["qa", "mutation-testing", "property-based-testing", "fuzzing", "code-review"]
+}
