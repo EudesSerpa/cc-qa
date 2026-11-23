@@ -33,6 +33,10 @@ how `--deep` raises the examples) and the test command of this stack.
      of commands on a ledger, wallet, queue or state machine keep the invariants (balance == sum of
      movements, no transition the model forbids, idempotent replays change nothing).
    If you cannot state a real rule for a function, skip it and say so. Do not invent properties.
+   Watch for vacuous properties: "the output stays inside the allowed set" also holds for an empty
+   or constant output. Pair every such invariant with a property or example that requires the real
+   result (round trip, oracle, a known input → its expected output). Hollow-test check: if the
+   test would still pass when the function returned nothing, it pins nothing.
 3. Write the tests following the project's conventions (file naming, location, settings for slow
    or fixture-based tests). Each example must create its own state and not depend on earlier
    examples.

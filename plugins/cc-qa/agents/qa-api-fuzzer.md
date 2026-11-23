@@ -26,6 +26,9 @@ the fuzz-test conventions and the test command.
      missing keys, duplicated ids.
    - **path/query fuzz**: random and malformed ids, ids of another tenant's rows, pagination
      extremes (`page=0`, `-1`, huge page size), search terms with `%`, `_`, quotes, accents.
+   - **one valid example per endpoint** that asserts the response content the spec promises, so the
+     file would fail if the handler returned an empty 2xx (hollow-test check: "no 5xx" alone
+     passes for a handler that does nothing).
    - **assertions for every response**: status < 500; error responses match the project's error
      contract (content type, error type/code); 2xx responses validate against the declared
      response schema.

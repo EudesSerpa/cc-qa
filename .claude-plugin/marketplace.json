@@ -9,7 +9,7 @@
       "name": "cc-qa",
       "source": "./plugins/cc-qa",
       "description": "/qa: adversarial QA on a diff with mutation, property-based, API fuzzing, AI red-team and review agents, plus a judge that leaves one failing test per confirmed bug.",
-      "version": "0.1.0"
+      "version": "0.2.0"
     }
   ]
 }

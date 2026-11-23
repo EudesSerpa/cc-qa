@@ -29,6 +29,15 @@ The diff commands and files, your lens, the spec sources, the change intent and 
 | `tenancy`     | Can tenant A read or write tenant B's data? Is the tenant binding (host, token claim, header), CSRF/Origin check or cookie scope bypassable on this path? |
 | `correctness` | Boundary values (0, 1, limit, limit+1, empty, null), state transitions the model does not allow, error contract (status + error code), spec mismatch     |
 
+   Whatever the lens, also check:
+   - **Masking fix**: a new guard, `try/except`, default value, `?.`/`??` or retry that makes a crash
+     or a failing test go away without fixing why the bad state exists. A guard that only hides
+     the crash is not a fix; name the root cause it skips.
+   - **Boundary**: outside data (request, file, provider reply, env) is validated where it enters,
+     once; logic inside trusts it. Flag validation missing at the edge, or re-validated
+     inconsistently deep inside.
+   - **Idempotency**: running the operation twice, or after a crash halfway, ends in the same
+     state (retries, webhooks, queued jobs, double clicks).
 4. For each suspicion, build a concrete scenario: inputs/state → wrong output. If you cannot name
    the inputs, it is not a finding. Check existing tests (`rg`) to see whether the case is already
    covered; a covered case is not a finding.

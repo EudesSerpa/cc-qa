@@ -34,6 +34,9 @@ For each finding, in order of severity:
      (then keep it as a regression test).
    - **gap** (mutation/property gaps): the test passes on the current code and kills a mutant or
      pins a rule. Keep it; it is a coverage gain, not a bug.
+   - **hollow**: the test would still pass if every function under test returned nothing
+     (`None`/`undefined`, empty, a constant). It pins nothing: delete it, or rewrite it to assert
+     the spec's result and re-judge. Apply this check to every test you keep, whatever its verdict.
 4. Run every test file you kept or touched once more and record pass/fail per test. Accepted bug
    tests must fail; all others must pass. When a suite shares a database, re-run a failing test in
    isolation before trusting it: order-dependent failures are common.
@@ -52,7 +55,7 @@ For each finding, in order of severity:
 
 ```
 VERDICTS:
-- <finding id>: accepted | rejected | gap — <one-line reason>
+- <finding id>: accepted | rejected | gap | hollow — <one-line reason>
   test: <file>::<name> (failing | passing)   severity: high|medium|low
 FINAL RUN:
 - <command>: <summary line>

@@ -135,7 +135,9 @@ Reply in the user's language with:
 1. **Verdict**: one line (e.g. "2 confirmed bugs, 1 test gap, 4 rejected").
 2. **Confirmed bugs**: table `severity | file:line | what fails | red test (path::name)`.
 3. **Test gaps** (surviving mutants, functions without tests, new passing properties): table with
-   the tests added to close them, or the mutants left as equivalent with the reason.
+   the tests added to close them, or the mutants left as equivalent with the reason. List
+   **dead code** separately (file:line + the callers searched), for a human to delete, and the
+   tests the judge marked **hollow** and removed.
 4. **Rejected**: one line each with the judge's reason.
 5. **Mutation score** per file, before/after when the tester added tests.
 6. **Files touched**: every test file created or changed (the user reviews them before
