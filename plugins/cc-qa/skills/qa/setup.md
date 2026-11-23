@@ -42,6 +42,11 @@ For each stack in the repo (a folder with its own manifest: `package.json`, `pyp
 | Rust                  | cargo-mutants                            | proptest                             |
 | JVM                   | PIT                                      | jqwik                                |
 
+CRAP hotspots, any stack above: [crapper](https://github.com/unclebob/crapper)
+(Robert C. Martin; TS/JS, Python, Go, Rust, Java, Clojure). Install it once per machine outside
+any repo (`git clone https://github.com/unclebob/crapper <tools dir>/crapper`, note the commit) and
+run it as `PYTHONUTF8=1 uv run --project <tools dir>/crapper python -m crapper ...`.
+
 Known gotchas (verified):
 
 - **StrykerJS 10 on Windows** breaks with `ERR_PACKAGE_IMPORT_NOT_DEFINED "#identifier"` (Babel 8
@@ -56,6 +61,15 @@ Known gotchas (verified):
 - **Hypothesis with function-scoped pytest fixtures** (async DB sessions, test clients): set
   `deadline=None` and suppress `HealthCheck.function_scoped_fixture` per test; each example must
   create its own rows.
+- **crapper**: its `./crapper` script assumes `python3` and `.venv/bin` (broken on Windows; use
+  `uv run --project`), and `--help` needs `PYTHONUTF8=1`. Its default run deletes coverage reports
+  and runs the whole test suite (and installs `coverage`/`pytest`/`@vitest/coverage-v8` into the
+  project): always produce scoped LCOV yourself and pass `--use-existing-coverage`. It reads
+  `<root>/target/coverage/**/lcov.info` and `<root>/coverage/**/lcov.info` and writes
+  `<root>/.metrics/crap.edn`: exclude `target/` and `.metrics/` locally unless the project already
+  uses them, then remove them after the run. Python coverage: `pytest-cov` via `uv run --with`,
+  `COVERAGE_FILE` in the scratch dir; Vitest: `@vitest/coverage-v8` matching the Vitest version,
+  installed with `--no-save`.
 - **Git Bash on Windows** rewrites leading-slash arguments to container commands: prefix them with
   `MSYS_NO_PATHCONV=1 MSYS2_ARG_CONV_EXCL='*'`.
 
@@ -125,6 +139,10 @@ why (e.g. the suite drops the schema at start)>
 - mutation: ... (report path, how to read survivors)
 - property tests: file naming, import, how `--deep` raises the examples
 - fuzz tests (API stacks): file naming, client fixture, auth helper
+
+## CRAP
+<tools dir; per stack: scoped LCOV command for given test files → path crapper reads; the crapper
+command; the isolated DB for backend coverage; what to clean up afterwards>
 
 ## Deep run
 <env vars / settings for --deep>

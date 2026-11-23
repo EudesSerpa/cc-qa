@@ -15,6 +15,11 @@ y deja un test rojo por bug confirmado. No corrige código ni hace commit.
 | `qa-ai-redteam`           | Respuestas hostiles del modelo en un pipeline con LLM                             |
 | `qa-judge`                | Reproduce cada hallazgo; deja un test rojo por bug aceptado                       |
 
+Antes de mutar, `/cc-qa:qa` corre [crapper](https://github.com/unclebob/crapper) sobre los archivos
+del diff, con cobertura medida solo con sus tests. Las funciones con CRAP ≥ 10 son la prioridad del
+tester de mutación, y el reporte muestra el CRAP antes y después. Las reglas de test vacío, código
+muerto y arreglos que esconden el problema vienen de [ub-mode](https://github.com/unclebob/ub-mode).
+
 ## Instalar
 
 ```text

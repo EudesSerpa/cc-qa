@@ -85,6 +85,23 @@ database service).
 Create the scratch root `<scratchpad>/qa/` (forward slashes). Every agent gets its own subfolder
 for temporary files and test temp dirs.
 
+## Step 3b: CRAP hotspots (before mutation)
+
+Run it yourself (it takes seconds) when the plan has `mutation` files and `project.md` has a `CRAP`
+section; otherwise skip it and say so in the report.
+
+1. Produce coverage **only from the covering test files of Step 2**, with the commands in the `CRAP`
+   section (never the whole suite, never the tool's default coverage run, which runs every test).
+   Backend tests use the CRAP database from `Test isolation`.
+2. Run crapper with `--use-existing-coverage` on the mutation files only.
+3. Hotspots: every function with CRAP ≥ 10, or with complexity ≥ 5 and no coverage. CRAP ≥ 30 is
+   high risk. Keep the table rows (function, file, CC, coverage, CRAP).
+4. Clean up exactly what the `CRAP` section says the run leaves behind.
+
+CRAP is a filter, not a verdict: 100% coverage gives a low score even when the tests assert
+nothing. Only mutation says whether the tests check behavior, so a clean CRAP table never skips
+mutation.
+
 ## Step 4: Dispatch (parallel)
 
 Launch every needed agent in ONE message so they run concurrently. Agents are namespaced by the
@@ -102,7 +119,8 @@ plugin: `subagent_type` is `cc-qa:<agent>`. Each prompt must contain:
   `API contract` for the fuzzer, `AI pipeline` for the red team;
 - its scratch folder and its isolated test resources (`Test isolation` in `project.md`): never a
   shared, dev or deployed database, and never the same one as another agent;
-- the deep run settings when `--deep` was given.
+- the deep run settings when `--deep` was given;
+- for `qa-mutation-tester`, the CRAP hotspot rows of its files (Step 3b).
 
 | Technique  | Agent                     | Count                             |
 | ---------- | ------------------------- | --------------------------------- |
@@ -140,11 +158,14 @@ Reply in the user's language with:
    tests the judge marked **hollow** and removed.
 4. **Rejected**: one line each with the judge's reason.
 5. **Mutation score** per file, before/after when the tester added tests.
-6. **Files touched**: every test file created or changed (the user reviews them before
+6. **CRAP**: the hotspot table from Step 3b, and the same functions after re-running Step 3b once
+   when the judge kept new tests (before → after). Functions still at CRAP ≥ 10 with full coverage
+   are candidates to split (complexity), which is a refactor for a human, not a QA task.
+7. **Files touched**: every test file created or changed (the user reviews them before
    committing). Mark the ones that import a tool the project does not declare (see
    `Personal tooling` in `project.md`): they cannot be committed until the project adopts that
    tool. No source file may appear here; if one does, flag it as a violation.
-7. **Next step**: offer to fix the confirmed bugs test-first (the red tests already exist).
+8. **Next step**: offer to fix the confirmed bugs test-first (the red tests already exist).
 
 Then stop. Do not fix, do not commit, do not push.
 

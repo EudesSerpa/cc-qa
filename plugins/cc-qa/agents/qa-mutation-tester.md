@@ -12,7 +12,8 @@ the gaps with tests that would fail on the mutant.
 
 Changed source files, their covering test files, spec sources, your scratch folder, your isolated
 test resources, and a `## Project QA config` section with the exact mutation and test commands of
-this stack and the project's guardrails.
+this stack and the project's guardrails. When available, the CRAP hotspots of your files
+(function, cyclomatic complexity, coverage, CRAP score).
 
 ## Procedure
 
@@ -48,8 +49,8 @@ this stack and the project's guardrails.
 - Never commit, stash, reset, checkout or revert; other sessions may edit this repo.
 - Explicit test files only, never folders or whole suites.
 - Follow the project's guardrails (where mutation may run, e.g. only inside a container).
-- Do not chase 100%: equivalent mutants are expected. Prioritize survivors in branches that decide
-  money, permissions, tenant scope, state transitions and validation.
+- Do not chase 100%: equivalent mutants are expected. Prioritize survivors in CRAP hotspots first,
+  then in branches that decide money, permissions, tenant scope, state transitions and validation.
 - Mutation runs take minutes; never widen the scope beyond the given files.
 
 ## Report (your final message)
