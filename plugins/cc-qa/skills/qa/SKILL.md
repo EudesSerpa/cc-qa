@@ -1,7 +1,7 @@
 ---
 name: qa
 description: Adversarial QA for the current change. Routes the diff to specialized agents (mutation testing, property-based testing, API fuzzing, AI red teaming, adversarial review) and has a judge turn every accepted finding into a failing test. Never fixes code, never commits.
-argument-hint: "[diff | <branch> | setup] [--paths <file>...] [--deep] [--review] [--only mutation|property|fuzz|redteam|review]"
+argument-hint: "[diff | files <path>... | <branch> | setup] [--paths <file>...] [--deep] [--review] [--only mutation|property|fuzz|redteam|review]"
 disable-model-invocation: true
 ---
 
@@ -25,6 +25,7 @@ generic and never assume a project.
 | _(none)_             | Same as `/qa <default base>` (`Default base` in `project.md`)                                                                                             |
 | `<branch>`           | Scope = what a PR from the current branch into `<branch>` would contain (`<branch>...HEAD`, from the merge base) + working-tree changes + untracked files |
 | `diff`               | Scope = only the uncommitted work: staged + unstaged changes vs `HEAD` + untracked files. Commits are ignored                                             |
+| `files <path>...`    | Audit mode: scope = exactly these files or folders, whether or not they changed. No diff: agents review the whole files               |
 | `setup`              | Create or refresh the QA config and tooling for this project ([setup.md](setup.md)), then stop                                                            |
 | `--paths <file>...`  | Narrow the scope to these files (use it when other sessions have edits in the working tree)                                                               |
 | `--deep`             | Use the deep run settings from `project.md` (more examples per property)                                                                                  |
@@ -41,6 +42,10 @@ before writing anything), then continue with the original arguments.
 
 1. Resolve the mode from the first positional argument:
    - `diff` → **worktree mode**. No base ref.
+   - `files` → **audit mode**. No base ref. The paths after `files` (up to the first `--` option)
+     are the scope; a folder expands to its tracked and untracked source files
+     (`git ls-files --cached --others --exclude-standard -- <folder>`). A path that does not exist:
+     stop and name it. `--paths` is redundant here and ignored.
    - anything else (default: `Default base` from `project.md`) → **branch mode** with `<branch>`
      as the target. Run `git fetch origin <branch> --quiet`, then use `origin/<branch>` as
      `<base>` if it exists, else the local `<branch>`. If neither resolves
@@ -56,12 +61,16 @@ before writing anything), then continue with the original arguments.
      Nothing to report → say there are no uncommitted changes and stop.
      With `--paths`, keep only the listed files (in worktree mode, only those with uncommitted
      changes).
+   - audit mode: the expanded paths. Note which of them have uncommitted changes
+     (`git status --porcelain -- <files>`) and list them in the plan: the audit runs on the
+     working-tree version.
 3. Other sessions or people may have edits in the working tree. In branch mode, if the working
    tree holds changes that do not belong to the branch's work (files you did not touch in this
    conversation and that the user did not mention), list them and ask the user whether to include
    them, unless `--paths` was given. In worktree mode the user asked for the whole working tree:
    include everything without asking, but list the files in the plan so foreign edits are
-   visible. Never stash, reset or revert anything.
+   visible. In audit mode the user named the files: never ask. Never stash, reset or revert
+   anything.
 4. Drop deleted files and the generated files listed in `project.md` (lockfiles, generated
    contracts).
 
@@ -110,10 +119,12 @@ plugin: `subagent_type` is `cc-qa:<agent>`. Each prompt must contain:
 - the files in its scope and the covering test files from Step 2;
 - the exact diff commands for the mode: branch mode `git diff <base>...HEAD -- <files>` and
   `git diff HEAD -- <files>`; worktree mode `git diff HEAD -- <files>` only. Untracked files have
-  no diff: the agent reads them whole;
+  no diff: the agent reads them whole. In audit mode there is no diff: say "audit of existing
+  code, review the whole files" and give no diff command;
 - the spec sources to read first (`Spec sources` in `project.md`, narrowed to the area), the
   docstrings/schemas of the changed code, and the change intent in one sentence (from the user or
-  the commit messages; never from your own reasoning about the implementation);
+  the commit messages; never from your own reasoning about the implementation). In audit mode
+  the intent is "audit: find bugs and test gaps in the current behavior" plus what the user said;
 - the sections of `project.md` that agent needs, pasted verbatim under a `## Project QA config`
   heading: always `Guardrails` and `Commands` of its stack, plus `Lens hints` for reviewers,
   `API contract` for the fuzzer, `AI pipeline` for the red team;

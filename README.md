@@ -44,6 +44,7 @@ Para probar cambios sin hacer push, agrega la carpeta local como marketplace:
 | `/cc-qa:qa`               | Igual que `/cc-qa:qa <rama base>` (la rama base sale de la configuración del proyecto)        |
 | `/cc-qa:qa <rama>`        | Lo que tendría un PR de la rama actual hacia `<rama>`, más los cambios sin commit              |
 | `/cc-qa:qa diff`          | Solo los cambios sin commit (staged, unstaged y archivos nuevos)                               |
+| `/cc-qa:qa files <ruta>...` | Auditoría: exactamente esos archivos o carpetas, cambiaran o no; los agentes revisan el archivo completo |
 | `/cc-qa:qa setup`         | Crea o actualiza la configuración de QA del proyecto                                           |
 
 Opciones: `--paths <archivo>...`, `--deep`, `--review`, `--only mutation|property|fuzz|redteam|review`.

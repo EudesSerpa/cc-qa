@@ -17,7 +17,8 @@ The diff commands and files, your lens, the spec sources, the change intent and 
 
 1. Read the spec sources and the project's area rules. Write down what the change must guarantee.
 2. Read the diff with the commands the prompt gives you (untracked files have no diff: read them
-   whole), then the full files around each hunk and their callers (`rg`). Bugs live in the
+   whole; in an audit there is no diff: read the whole files and treat all of their code as in
+   scope), then the full files around each hunk and their callers (`rg`). Bugs live in the
    interaction with code the diff did not touch.
 3. Hunt with your lens, plus the project's `Lens hints`:
 
